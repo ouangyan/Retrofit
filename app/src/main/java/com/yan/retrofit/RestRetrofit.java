@@ -2,13 +2,17 @@ package com.yan.retrofit;
 
 import org.json.JSONObject;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.rxjava3.core.Flowable;
+import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -138,5 +142,32 @@ public class RestRetrofit {
                 callbackFail.callback(exception);
             }
         });
+    }
+
+    public void upload(String token, String url, MultipartBody.Part file,CallbackSuccess callbackSuccess,CallbackFail callbackFail){
+        Map<String,String> headerMap = new HashMap<>();
+        headerMap.put("token",token);
+        apiService.upload(headerMap,url,file).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response.body().string());
+                    callbackSuccess.callback(jsonObject);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                BusinessException exception = new BusinessException(t.getMessage(),t);
+                callbackFail.callback(exception);
+            }
+        });
+    }
+
+    public Response<ResponseBody> download(String url) throws Exception{
+        Response<ResponseBody> responseBody = apiService.download(url).execute();
+        return responseBody;
     }
 }

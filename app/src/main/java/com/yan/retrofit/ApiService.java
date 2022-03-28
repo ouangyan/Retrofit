@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import java.util.Map;
 
 import io.reactivex.rxjava3.core.Flowable;
+import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -15,8 +16,10 @@ import retrofit2.http.Header;
 import retrofit2.http.HeaderMap;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
+import retrofit2.http.Streaming;
 import retrofit2.http.Url;
 
 public interface ApiService {
@@ -45,7 +48,21 @@ public interface ApiService {
     @FormUrlEncoded
     Flowable<ResponseBody> push2(@HeaderMap Map<String,String> headerMap,@Url String url, @FieldMap Map<String,Object> paramMap);
 
+    /**
+     * 上传文件
+     * @param file
+     * @return
+     */
     @Multipart
     @POST
-    Call<ResponseBody> upload();
+    Call<ResponseBody> upload(@HeaderMap Map<String,String> headerMap,@Url String url,@Part MultipartBody.Part file);
+
+    /**
+     * 下载文件
+     * @param url
+     * @return
+     */
+    @Streaming
+    @GET
+    Call<ResponseBody> download(@Url String url);
 }
